@@ -4,13 +4,13 @@ const ErrorHandler  = require("../utils/errorHandler");
 const { generateToken } = require('../utils/jwt.utils');
 
 const registerUser = asyncHandler(async (req, res) => {
-    const { name, email, password } = req.body;
+    const { name, email, password,phoneNumber } = req.body;
 
 
     let existingUser = await userCollection.findOne({ email});
     if (existingUser) throw new ErrorHandler("email already exists",400);
 
-    let newUser = await userCollection.create({ name, email, password });
+    let newUser = await userCollection.create({ name, email, password,phoneNumber });
     res.status(201).json({
         success: true,
         message: 'User registered successfully',
@@ -56,437 +56,48 @@ const registerUser = asyncHandler(async (req, res) => {
    });   
  });
 
- const updateUserProfile = asyncHandler(async (req,res)=>{ });//we can update name email and phone number
+ const updateUserProfile = asyncHandler(async (req,res)=>{ 
+   const { _id} = req.myUser;
+   const { name, email, phoneNumber } = req.body;
+
+   const updateUser = await userCollection.findByIdAndUpdate(
+      { _id },
+      {$set: { name, email, phoneNumber } },
+      {new : true}
+   );
+   res.status(200).json({  
+       success: true,
+       message: "user updated successfully",
+       data: updateUser,
+   });
+ });//we can update name email and phone number
 
 
  const updateUserPassword = asyncHandler(async (req,res)=>{});//todo
 
 const deleteUserProfile = asyncHandler(async (req,res)=>{
    const {_id } = req.myUser;//this will get from authenticate middleware
+   const deleteUser = await userCollection.findByIdAndDelete(_id); //findOne and deleteOne 
+   if(!deleteUser) throw new ErrorHandler("user not found",404);
+   res.status(200).json({
+       success: true,
+       message: "user deleted successfully",
+       data: deleteUser,
+   });
 });// delete  the profile
+
+const  getLoggedInUserProfile = asyncHandler(async (req,res)=>{
+   res.status(200).json({
+       success: true,
+       userDetails : req.myUser,
+   });
+});
 
 const getCurrentUserProfile =  asyncHandler(async (req,res)=>{});// in the frontend
 
 
 
  module.exports = {
-    registerUser,loginUser,logoutUser,updateUserProfile,updateUserPassword,deleteUserProfile,getCurrentUserProfile};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
+    registerUser,loginUser,logoutUser,updateUserProfile,updateUserPassword,
+    deleteUserProfile,getCurrentUserProfile, getLoggedInUserProfile
+   };

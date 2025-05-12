@@ -21,7 +21,7 @@ const authenticate = asyncHandler(async (req, res, next) => {
     req.myUser = user;
     next();
 });
-module.exports = { authenticate };
+module.exports = { authenticate }; 
 
 
 
