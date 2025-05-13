@@ -73,7 +73,20 @@ const registerUser = asyncHandler(async (req, res) => {
  });//we can update name email and phone number
 
 
- const updateUserPassword = asyncHandler(async (req,res)=>{});//todo
+ const updateUserPassword = asyncHandler(async (req,res)=>{
+   let { newPassword } = req.body;
+
+
+   let user =  await userCollection.findById(req.myUser._id); // authenticate middleware
+   user.password = newPassword;//assigning the value
+   await user.save();//save the data in the db and save will be 
+
+
+   res.status(200).json({
+      success: true,
+      message: "password updated successfully",
+   });
+ });//todo
 
 const deleteUserProfile = asyncHandler(async (req,res)=>{
    const {_id } = req.myUser;//this will get from authenticate middleware
@@ -98,6 +111,12 @@ const getCurrentUserProfile =  asyncHandler(async (req,res)=>{});// in the front
 
 
  module.exports = {
-    registerUser,loginUser,logoutUser,updateUserProfile,updateUserPassword,
-    deleteUserProfile,getCurrentUserProfile, getLoggedInUserProfile
+    registerUser,
+    loginUser,
+    logoutUser,
+    updateUserProfile,
+    updateUserPassword,
+    deleteUserProfile,
+    getCurrentUserProfile,
+     getLoggedInUserProfile
    };
