@@ -1,12 +1,16 @@
 const asyncHandler = require("express-async-handler");
-const { cloudinary } = require("../config/cloudinary");  
+const { v2 } = require("../config/cloudinary"); 
+const cloud = require("cloudinary"); 
+const fs = require("fs");
 
-const cloud = require("cloudinary");
-console.log(cloudinary);
 
-let uploadImgOnCloudinary = asyncHandler(async (path) => {
-    let result = await cloud.uploader.upload(path); 
-    console.log(result);
+const uploadImgOnCloudinary = asyncHandler(async (path) => {
+    if(!path) return null;
+    let uploadResponse = await cloud.uploader.upload(path,{
+        folder: "bitByte",
+    }); 
+    fs.unlinkSync(path); // delete the file from local storage
+    return uploadResponse;
 });
 
 module.exports = { uploadImgOnCloudinary };
