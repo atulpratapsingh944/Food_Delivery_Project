@@ -9,8 +9,15 @@ const uploadImgOnCloudinary = asyncHandler(async (path) => {
     let uploadResponse = await cloud.uploader.upload(path,{
         folder: "bitByte",
     }); 
+    
     fs.unlinkSync(path); // delete the file from local storage
     return uploadResponse;
 });
 
-module.exports = { uploadImgOnCloudinary };
+
+const deleteImageFromCloudinary = asyncHandler (async (id)=>{
+    let result = await cloud.uploader.destroy(id);
+    return result;
+})
+  
+module.exports = { uploadImgOnCloudinary, deleteImageFromCloudinary };
