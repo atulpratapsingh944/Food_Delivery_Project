@@ -3,7 +3,9 @@ require('dotenv').config();
 
 const userRoutes = require('./src/routes/user.routes');
 const foodRoutes = require('./src/routes/food.routes');
-const cartRoutes = require("./src/routes/cart.routes")
+const cartRoutes = require("./src/routes/cart.routes");
+const orderRoutes = require("./src/routes/order.routes");
+
 const error = require('./src/middlewares/error.middleware');
 const cokkieParser = require('cookie-parser');
 const app = express();
@@ -16,6 +18,7 @@ app.use(cokkieParser());
 app.use("/users/v1", userRoutes);
 app.use("/foods/v1", foodRoutes);
 app.use("/cart/v1", cartRoutes);
+app.use("/orders/v1", orderRoutes);
 
 // ! errror middleware
 app.use(error);
