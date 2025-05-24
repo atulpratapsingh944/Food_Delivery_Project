@@ -69,11 +69,14 @@ const placeOrder = asyncHandler(async (req, res) => {
     line_items,
     payment_method_types: ["card"],
     mode: "payment",
-    success_url: `http://localhost:9000/oreders/v1/verify-order?orderId=${newOrder._id}&success=true`,
-    cancel_url: `http://localhost:9000/oreders/v1/verify-order?orderId=${newOrder._id}&success=false`,
+    success_url: `http://localhost:9000/orders/v1/verify-order?orderId=${newOrder._id}&success=true`,
+    cancel_url: `http://localhost:9000/orders/v1/verify-order?orderId=${newOrder._id}&success=false`,
   });
 
   console.log(session);
+
+  // ! clear the cart 
+  await userCollection.findByIdAndUpdate(currentUser._id, {cartData:{}, });
 
   res.status(200).json({
     success: true,
@@ -83,6 +86,51 @@ const placeOrder = asyncHandler(async (req, res) => {
   });
 });
 
+const verifyOrder = asyncHandler(async (req, res) => {
+  console.log(req.query);
+  const orderId = req.query.orderId;
+  let flag = req.query.success;
+  
+  let order = await orderCollection.findById(orderId);
+  if(flag === "true") {
+    order.payment = true;
+    order.status = "processing";
+    await order.save();
+    return res.status(200).json({
+      success: true,
+      message: " order placed successfully",
+    });
+  }
+    else {
+      order.payment = false;
+      order.status = "cancelled";
+      await order.save();
+      return res.status(402).json({
+        success: true,
+        message: "order failed",
+      });
+    
+  }
+
+});
+
+const getOrder = asyncHandler(async (req, res) => {
+  const currentUser = req.myUser._id;
+  const orders = await orderCollection.find({ userId: currentUserId });
+ if(orders.length === 0 ) throw new ErrorHandler("no orders found", 404);
+  res.status(200).json({
+    success: true,
+    message: "orders fetched successfully",
+    count: orders.length,
+    data: orders,
+  });
+
+  // ! Functionalities for admin  
+  // ? update the order status
+  // ? get all orders
+ 
+});
+
 module.exports = {
-  placeOrder,
+  placeOrder,verifyOrder,getOrder
 };
